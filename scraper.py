@@ -23,7 +23,7 @@ def extract_next_links(url, resp):
         for link in soup_parser.find_all('a'):
             link_info = link.get('href')
             if link_info:
-                new_link = link_info.strip().split("\n")
+                new_link = link_info.strip().split("#")
                 all_links.append(new_link)
                 print(new_link)
         return all_links
