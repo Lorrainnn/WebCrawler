@@ -15,7 +15,60 @@ def extract_next_links(url, resp):
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
-    return list()
+
+    #check whether it has a valid link
+    if not resp.status == 200:
+        return []
+
+    #Find all the url in the html file
+    from bs4 import BeautifulSoup
+    html_content = resp.raw_response.content
+    soup = BeautifulSoup(html_content, 'html.parser')
+    links = soup.find_all('a')
+    url_set = set()
+
+    #for all the url, we normalize it, check whether is_valid and add it to the return_list
+    for link in links:
+        href = link.get('href')
+
+        #combine the relative url and base url to absolute url
+        from urllib.parse import urljoin
+        abs_url = urljoin(resp.url, href) if href else resp.url
+        parsed = urlparse(abs_url)
+
+        #process scheme by lowercasing it and remove default host
+        new_scheme = parsed.scheme.lower()
+        new_netloc = parsed.netloc.lower()
+        #if http has default:80 and:443, remove it using replace
+        if new_scheme == "http":
+            new_netloc = new_netloc.replace(":80", "")
+        if new_scheme == "https":
+            new_netloc = new_netloc.replace(":443", "")
+
+        # normalize the path
+        import posixpath
+        new_path = posixpath.normpath(parsed.path)
+
+        #sort the query
+        #use unquote to decode the query
+        from urllib.parse import unquote, urlencode, parse_qsl
+        decoded_query = unquote(parsed.query)
+        #make a list consisting of [key, value] pair
+        key_value_querylist = parse_qsl(decoded_query, keep_blank_values = True)
+        #sort the key_value_list
+        sorted_query = sorted(key_value_querylist, key = lambda single:single[0])
+        #encode it back to query
+        new_query = urlencode(sorted_query,doseq = True)
+
+        #combine all the modified scheme, netloc, path, query with removing fragment to the new url
+        from urllib.parse import urlunparse
+        new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
+
+        #check whether the url is valid
+        if is_valid(new_url):
+            url_set.add(new_url)
+
+    return list(url_set)
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
@@ -23,8 +76,30 @@ def is_valid(url):
     # There are already some conditions that return False.
     try:
         parsed = urlparse(url)
+
+        #check whether scheme is http or https
         if parsed.scheme not in set(["http", "https"]):
             return False
+
+        #check the domain
+        if not parsed.netloc.endswith(".informatics.uci.edu") and not parsed.netloc.endswith(".ics.uci.edu") and not parsed.netloc.endswith(".cs.uci.edu") and not parsed.netloc.endswith(".stat.uci.edu"):
+            return False
+
+        #check the robots.txt
+        #first we get the url for robots.txt
+        robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
+        #import robotparser and build the robotfileparser
+        import urllib.robotparser
+        robot_parser = urllib.robotparser.RobotFileParser()
+        #set the url of robot parser to robots.txt
+        robot_parser.set_url(robot_url)
+        #read the allow
+        robot_parser.read()
+        #check whether we are able to get the content in robots.txt
+        if not robot_parser.can_fetch("IR US24 Our ID", robot_url):
+            return False
+
+        #given code
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
