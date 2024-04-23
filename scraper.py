@@ -72,14 +72,14 @@ def extract_next_links(url, resp):
 
         #combine all the modified scheme, netloc, path, query with removing fragment to the new url
         new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
-
-        if len(url_list)>=2:
+        if len(url_list) >= 2:
             if similarity_check(url_list[-2], new_url):
                 url_list.append(new_url)
                 store_temp_data(resp, new_url)
         else:
             url_list.append(new_url)
             store_temp_data(resp, new_url)
+
 
     return url_list
 
