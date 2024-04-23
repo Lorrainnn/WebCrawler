@@ -12,7 +12,7 @@ import urllib.robotparser
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    return links
+    return [link for link in links if is_valid(link)]
 
 def extract_next_links(url, resp):
     # Implementation required.
@@ -40,8 +40,9 @@ def extract_next_links(url, resp):
         href = link.get('href')
         #remove fragment
         if href is not None:
-            href = href.split('#')[0]
-
+            new_url = href.split('#')[0]
+            url_set.add(new_url)
+            """
         #combine the relative url and base url to absolute url
         abs_url = urljoin(resp.url, href) if href else resp.url
         parsed = urlparse(abs_url)
@@ -76,12 +77,12 @@ def extract_next_links(url, resp):
         # check whether the url is valid
         if is_valid(new_url):
             url_set.add(new_url)
-
-        with open("temp_data.json","a") as f:
-            parser = BeautifulSoup(resp.raw_response.content, 'html.parser')
-            data = {new_url:parser.get_text().lower()}
-            json.dump(data, f)
-            f.write("\n")
+"""
+            with open("temp_data.json","a") as f:
+                parser = BeautifulSoup(resp.raw_response.content, 'html.parser')
+                data = {new_url:parser.get_text().lower()}
+                json.dump(data, f)
+                f.write("\n")
 
     return list(url_set)
 
