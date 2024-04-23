@@ -25,8 +25,8 @@ class Calculation:
             for line in f:
                 # Parse the JSON object from the line
                 data = json.loads(line)
-                url = data["url"]
-                content = data["content"]
+                url = list(data.keys())[0]  # Convert dict_keys object to list and get the first (and only) key
+                content = data[url]
                 self.data[url] = content
 
     #question 1
@@ -34,21 +34,31 @@ class Calculation:
         self.unique_page = len(self.data)
 
 
-    #Question 2,3?
+    #Question 2,3
     def longest_page_and_50_common_word(self):
-        for pair in self.data.items():
-            tokens = tokenize(pair[1])
+        for key, value in self.data.items():
+            tokens = tokenize(value)
             length = len(tokens)
+
             if length>self.longest_page_len:
-                self.longest_page_url = pair[0]
+                self.longest_page_url = key
                 self.longest_page_len = length
 
             words = computeWordFrequencies(tokens)
+
+            for key_w in words:
+                # If the key is present in dict1, add the corresponding values
+                if key_w in self.frequency:
+                    self.frequency[key_w] += words[key_w]
+                # If the key is not present in dict1, add it with its value
+                else:
+                    self.frequency[key_w] = words[key_w]
+
             self.frequency.update(words)
-        self.frequency = sorted(self.frequency.items(), key = lambda x: (-x[1], x[0]))
 
 
-    #question 4?
+
+    #question 4
     def count_subdomain(self):
         try:
             for ele in self.data.keys():
@@ -65,6 +75,7 @@ class Calculation:
         self.extract_data()
         self.count_unique_pages()
         self.count_subdomain()
+        self.longest_page_and_50_common_word()
 
         with open('reportQ1.txt', 'w', encoding = "utf-8") as w:
             w.write(f'Number of unique pages: {self.unique_page}\n')
@@ -78,11 +89,12 @@ class Calculation:
             w.write(self.data[self.longest_page_url])
 
         with open('reportQ3.txt', 'w', encoding = "utf-8") as w:
-            for token, count in self.frequency[0:50]:
+            top_50 = sorted(self.frequency.items(), key=lambda x: x[1], reverse=True)[:50]
+            for token, count in top_50:
                 w.write(f"{token} - {count}\n")
 
         with open('reportQ4.txt', 'w', encoding = "utf-8") as w:
-            for domain, num in self.domains:
+            for domain, num in self.domains.items():
                 w.write(f"{domain} - {num}\n")
 
 

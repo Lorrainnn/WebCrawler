@@ -1,0 +1,14 @@
+www.stat.uci.edu - 24
+mds.ics.uci.edu - 1
+www.ics.uci.edu - 138
+statconsulting.ics.uci.edu - 1
+www.cs.uci.edu - 2
+www.informatics.uci.edu - 2
+swiki.ics.uci.edu - 4509
+mcs.ics.uci.edu - 1
+mhcid.ics.uci.edu - 1
+mswe.ics.uci.edu - 1
+support.ics.uci.edu - 4
+password.ics.uci.edu - 1
+wiki.ics.uci.edu - 3
+hub.ics.uci.edu - 2
