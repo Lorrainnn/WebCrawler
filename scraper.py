@@ -1,9 +1,14 @@
 import re
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+import posixpath
+from urllib.parse import urlunparse
+from urllib.parse import urljoin
+from urllib.parse import unquote, urlencode, parse_qsl
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    return [link for link in links if is_valid(link)]
+    return links
 
 def extract_next_links(url, resp):
     # Implementation required.
@@ -21,7 +26,6 @@ def extract_next_links(url, resp):
         return []
 
     #Find all the url in the html file
-    from bs4 import BeautifulSoup
     html_content = resp.raw_response.content
     soup = BeautifulSoup(html_content, 'html.parser')
     links = soup.find_all('a')
@@ -32,13 +36,13 @@ def extract_next_links(url, resp):
         href = link.get('href')
 
         #combine the relative url and base url to absolute url
-        from urllib.parse import urljoin
         abs_url = urljoin(resp.url, href) if href else resp.url
         parsed = urlparse(abs_url)
 
-        #process scheme by lowercasing it and remove default host
+        #process scheme by lowercase it and remove default host
         new_scheme = parsed.scheme.lower()
         new_netloc = parsed.netloc.lower()
+
         #if http has default:80 and:443, remove it using replace
         if new_scheme == "http":
             new_netloc = new_netloc.replace(":80", "")
@@ -46,12 +50,10 @@ def extract_next_links(url, resp):
             new_netloc = new_netloc.replace(":443", "")
 
         # normalize the path
-        import posixpath
         new_path = posixpath.normpath(parsed.path)
 
         #sort the query
         #use unquote to decode the query
-        from urllib.parse import unquote, urlencode, parse_qsl
         decoded_query = unquote(parsed.query)
         #make a list consisting of [key, value] pair
         key_value_querylist = parse_qsl(decoded_query, keep_blank_values = True)
@@ -60,11 +62,11 @@ def extract_next_links(url, resp):
         #encode it back to query
         new_query = urlencode(sorted_query,doseq = True)
 
+
         #combine all the modified scheme, netloc, path, query with removing fragment to the new url
-        from urllib.parse import urlunparse
         new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
 
-        #check whether the url is valid
+        # check whether the url is valid
         if is_valid(new_url):
             url_set.add(new_url)
 
@@ -98,6 +100,7 @@ def is_valid(url):
         #check whether we are able to get the content in robots.txt
         if not robot_parser.can_fetch("IR US24 Our ID", robot_url):
             return False
+
 
         #given code
         return not re.match(
