@@ -1,5 +1,5 @@
 Longest page: https://swiki.ics.uci.edu/doku.php/commands:screen?difftype=sidebyside&do=diff&rev=1453500286
-Number of words: 2005
+Number of words: 1584
 
 
 
