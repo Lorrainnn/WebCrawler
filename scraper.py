@@ -38,6 +38,9 @@ def extract_next_links(url, resp):
     #for all the url, we normalize it, check whether is_valid and add it to the return_list
     for link in links:
         href = link.get('href')
+        #remove fragment
+        if href is not None:
+            href = href.split('#')[0]
 
         #combine the relative url and base url to absolute url
         abs_url = urljoin(resp.url, href) if href else resp.url
@@ -160,6 +163,6 @@ def check_robots_txt(url):
     robot_parser.set_url(robot_url)
     # check whether we are able to get the content in robots.txt
     robot_parser.read()
-    if not robot_parser.can_fetch("IR US24 Our ID", url):
+    if not robot_parser.can_fetch("IR US24 31754916,39263968,57585853", url):
         return False
     return True
