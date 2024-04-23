@@ -1,7 +1,7 @@
 import json
 from PartA import *
 from urllib.parse import urlparse
-from difflib import SequenceMatcher
+
 
 class Calculation:
     def __init__(self):
@@ -27,6 +27,7 @@ class Calculation:
                 data = json.loads(line)
                 url = list(data.keys())[0]  # Convert dict_keys object to list and get the first (and only) key
                 content = data[url]
+
                 self.data[url] = content
 
     #question 1

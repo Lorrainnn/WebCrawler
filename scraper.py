@@ -8,11 +8,12 @@ from urllib.parse import urljoin
 from urllib.parse import unquote, urlencode, parse_qsl
 import urllib.robotparser
 
+from difflib import SequenceMatcher
 
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    return links
+    return [link for link in links if is_valid(link)]
 
 def extract_next_links(url, resp):
     # Implementation required.
@@ -33,7 +34,7 @@ def extract_next_links(url, resp):
     html_content = resp.raw_response.content
     soup = BeautifulSoup(html_content, 'html.parser')
     links = soup.find_all('a')
-    url_set = set()
+    url_list = []
 
     #for all the url, we normalize it, check whether is_valid and add it to the return_list
     for link in links:
@@ -72,17 +73,25 @@ def extract_next_links(url, resp):
         #combine all the modified scheme, netloc, path, query with removing fragment to the new url
         new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
 
-        # check whether the url is valid
-        if is_valid(new_url):
-            url_set.add(new_url)
+        if len(url_list)>=2:
+            if similarity_check(url_list[-2], new_url):
+                url_list.append(new_url)
+                store_temp_data(resp, new_url)
+        else:
+            url_list.append(new_url)
+            store_temp_data(resp, new_url)
 
-            with open("temp_data.json","a") as f:
-                parser = BeautifulSoup(resp.raw_response.content, 'html.parser')
-                data = {new_url:parser.get_text().lower()}
-                json.dump(data, f)
-                f.write("\n")
+    return url_list
 
-    return list(url_set)
+def store_temp_data(resp, url):
+    with open("temp_data.json", "a") as f:
+        parser = BeautifulSoup(resp.raw_response.content, 'html.parser')
+        data = {url: parser.get_text().lower()}
+        json.dump(data, f)
+        f.write("\n")
+
+def similarity_check(url,last_url):
+    return SequenceMatcher(None, last_url, url).ratio() < 0.85
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
