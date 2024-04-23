@@ -5,6 +5,8 @@ import posixpath
 from urllib.parse import urlunparse
 from urllib.parse import urljoin
 from urllib.parse import unquote, urlencode, parse_qsl
+import urllib.robotparser
+
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -80,27 +82,19 @@ def is_valid(url):
         parsed = urlparse(url)
 
         #check whether scheme is http or https
-        if parsed.scheme not in set(["http", "https"]):
+        if parsed.scheme not in {"http", "https"}:
             return False
 
         #check the domain
-        if not parsed.netloc.endswith(".informatics.uci.edu") and not parsed.netloc.endswith(".ics.uci.edu") and not parsed.netloc.endswith(".cs.uci.edu") and not parsed.netloc.endswith(".stat.uci.edu"):
+        if not check_domain(url):
             return False
 
-        #check the robots.txt
-        #first we get the url for robots.txt
-        robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
-        #import robotparser and build the robotfileparser
-        import urllib.robotparser
-        robot_parser = urllib.robotparser.RobotFileParser()
-        #set the url of robot parser to robots.txt
-        robot_parser.set_url(robot_url)
-        #read the allow
-        robot_parser.read()
-        #check whether we are able to get the content in robots.txt
-        if not robot_parser.can_fetch("IR US24 Our ID", robot_url):
+        #check irrelevant file to avoid trap like in calender
+        if not check_irrelevant(url):
             return False
-
+        #check are we allowed to crawl
+        if not check_robots_txt(url):
+            return False
 
         #given code
         return not re.match(
@@ -116,3 +110,47 @@ def is_valid(url):
     except TypeError:
         print ("TypeError for ", parsed)
         raise
+
+
+def check_domain(url):
+    # Define a regular expression pattern to match the desired domains
+    domain_pattern = r'\.(informatics\.uci\.edu|ics\.uci\.edu|cs\.uci\.edu|stat\.uci\.edu)$'
+
+    # Search for the domain pattern in the URL
+    match = re.search(domain_pattern, url)
+
+    # If the domain matches, return True, else return False
+    return bool(match)
+
+def check_irrelevant(url):
+    irrelevant_patterns = [
+                        r'\bpdf\b',
+                        r'calendar',
+                        r'\?share',
+                        r'upload',
+                        r'\?action',
+                        r'\?redirect',
+                        r'/attachment',
+                        r'\?attachment',
+                        r'events',
+                        r'wp-login',
+                        r'\?ical']
+
+    for pattern in irrelevant_patterns:
+        if re.search(pattern, url):
+            return False
+    return True
+
+def check_robots_txt(url):
+    # check the robots.txt(politeness)
+    # first we get the url for robots.txt
+    parsed = urlparse(url)
+    robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
+    robot_parser = urllib.robotparser.RobotFileParser()
+    #set the url of robot parser to robots.txt
+    robot_parser.set_url(robot_url)
+    # check whether we are able to get the content in robots.txt
+    robot_parser.read()
+    if not robot_parser.can_fetch("IR US24 Our ID", url):
+        return False
+    return True
