@@ -123,7 +123,7 @@ def is_valid(url):
 
 def check_domain(url):
     # Define a regular expression pattern to match the desired domains
-    domain_pattern = r'\.(informatics\.uci\.edu|ics\.uci\.edu|cs\.uci\.edu|stat\.uci\.edu)$'
+    domain_pattern = r'(.*\.ics\.uci\.edu/.*|.*\.cs\.uci\.edu/.*|.*\.informatics\.uci\.edu/.*|.*\.stat\.uci\.edu/.*)'
 
     # Search for the domain pattern in the URL
     match = re.search(domain_pattern, url)
