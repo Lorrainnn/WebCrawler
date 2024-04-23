@@ -91,6 +91,7 @@ def is_valid(url):
     try:
         parsed = urlparse(url)
 
+        #直接换成一行，为什么我要写这么多if，这些真的有用吗？？？
         #check whether scheme is http or https
         if parsed.scheme not in {"http", "https"}:
             return False
@@ -99,12 +100,18 @@ def is_valid(url):
         if not check_domain(url):
             return False
 
-        #check irrelevant file to avoid trap like in calender
-        if not check_irrelevant(url):
+        if not check_length(url):
+            return False
+
+        #check repeating file to avoid trap like in calender
+        if not check_repeating(url):
             return False
 
         #check are we allowed to crawl
         if not check_robots_txt(url):
+            return False
+
+        if not check_exclude_url(url):
             return False
 
         #given code
@@ -119,7 +126,7 @@ def is_valid(url):
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
 
     except TypeError:
-        print ("TypeError for ", parsed)
+        print ("TypeError for ", urlparse(url))
         raise
 
 
@@ -133,24 +140,27 @@ def check_domain(url):
     # If the domain matches, return True, else return False
     return bool(match)
 
-def check_irrelevant(url):
-    irrelevant_patterns = [
-                        r'\bpdf\b',
-                        r'calendar',
-                        r'\?share',
-                        r'upload',
-                        r'\?action',
-                        r'\?redirect',
-                        r'/attachment',
-                        r'\?attachment',
-                        r'events',
-                        r'wp-login',
-                        r'\?ical']
+def check_length(url):
+    return len(url)<200
 
-    for pattern in irrelevant_patterns:
-        if re.search(pattern, url):
-            return False
+def check_repeating(url):
+    # check for repeating directories
+    # Source: https://support.archive-it.org/hc/en-us/articles/208332963-Modify-your-crawl-scope-with-a-Regular-Expression#RepeatingDirectories
+    if re.match(r"^.*?(/.+?/).*?\1.*$|^.*?/(.+?/)\2.*$", url):
+        return False
     return True
+
+def check_exclude_url(url):
+    # Set of patterns to be blocked
+    useless_data = {"pdf", "calendar", "?share", "upload", "?action", "?redirect", "/attachment", "?attachment", "events", "wp-login", "?ical"}
+
+    # Check if the URL contains any of the blocked patterns
+    for pattern in useless_data:
+        if pattern in url:
+            return True
+
+    # If none of the patterns match, include the URL
+    return False
 
 def check_robots_txt(url):
     # check the robots.txt(politeness)
