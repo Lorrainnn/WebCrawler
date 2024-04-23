@@ -8,8 +8,6 @@ from urllib.parse import urljoin
 from urllib.parse import unquote, urlencode, parse_qsl
 import urllib.robotparser
 
-from difflib import SequenceMatcher
-
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -72,14 +70,8 @@ def extract_next_links(url, resp):
 
         #combine all the modified scheme, netloc, path, query with removing fragment to the new url
         new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
-        if len(url_list) >= 2:
-            if similarity_check(url_list[-2], new_url):
-                url_list.append(new_url)
-                store_temp_data(resp, new_url)
-        else:
-            url_list.append(new_url)
-            store_temp_data(resp, new_url)
 
+        url_list.append(new_url)
 
     return url_list
 
@@ -90,8 +82,7 @@ def store_temp_data(resp, url):
         json.dump(data, f)
         f.write("\n")
 
-def similarity_check(url,last_url):
-    return SequenceMatcher(None, last_url, url).ratio() < 0.85
+
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
