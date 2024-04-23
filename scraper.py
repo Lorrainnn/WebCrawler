@@ -1,4 +1,5 @@
 import re
+import json
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import posixpath
@@ -6,6 +7,7 @@ from urllib.parse import urlunparse
 from urllib.parse import urljoin
 from urllib.parse import unquote, urlencode, parse_qsl
 import urllib.robotparser
+
 
 
 def scraper(url, resp):
@@ -72,6 +74,12 @@ def extract_next_links(url, resp):
         if is_valid(new_url):
             url_set.add(new_url)
 
+        with open("temp_data.json","a") as f:
+            parser = BeautifulSoup(resp.raw_response.content, 'html.parser')
+            data = {new_url:parser.get_text().lower()}
+            json.dump(data, f)
+            f.write("\n")
+
     return list(url_set)
 
 def is_valid(url):
@@ -92,6 +100,7 @@ def is_valid(url):
         #check irrelevant file to avoid trap like in calender
         if not check_irrelevant(url):
             return False
+
         #check are we allowed to crawl
         if not check_robots_txt(url):
             return False
