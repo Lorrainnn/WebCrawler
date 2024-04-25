@@ -41,6 +41,7 @@ stop_word = {
     "who", "who's", "whom", "why", "why's", "with", "won't", "would", "wouldn't", "you", "you'd",
     "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"
 }
+# file extensions that we should not scrap for
 FILE_EXTENSIONS = (r".*\.(css|js|bmp|gif|jpe?g|ico"
                 + r"|png|tiff?|mid|mp2|mp3|mp4"
                 + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
@@ -67,7 +68,7 @@ def printall():
 
 
 def scraper(url, resp):
-    #this try exception block is used to detect some undefined cerficate error
+    # used to detect for undefined certificate error
     try:
         links = extract_next_links(url, resp)
         return links
@@ -87,17 +88,17 @@ def extract_next_links(url, resp) -> list:
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
     
     #check whether it has a valid link
-    if not resp.status == 200:
+    if resp.status != 200:
         return []
 
-    # keep track of depth. if depth > 10, we will not visit it anymore. Here is how depth work
-    # if we have 5 websites: a b c and a have b link (a ->b), b have c link (b ->c), then depth of a =1 , depth of b =1, depth of c =1
+    # Keep track of depth. if depth > 10, we will not visit it anymore. 
+    # Here is how depth works: if we have 5 websites: a b c and a has b link (a ->b)
+    # b has c link (b ->c), then depth of a =1 , depth of b =1, depth of c =1
     global depth
     if resp.url not in depth:
         depth[resp.url] = 1
     elif depth[resp.url] > 10:
         return []
-    
     
     # check the robots.txt
     parsed = urlparse(resp.url) # for later use
@@ -110,24 +111,19 @@ def extract_next_links(url, resp) -> list:
     soup = BeautifulSoup(html_content, 'html.parser')
     content = soup.get_text()
     length = int(resp.raw_response.headers.get("Content-Length", len(content)))
-    if length == 0:
-        return []
-    if length >= 1000000:
+    if length == 0 or length >= 1000000:
         return []
 
     #update the longest_url_website
-    global longest_number
-    global longest_url
+    global longest_number, longest_url, finger_print
     if length > longest_number:
         longest_number = length
         longest_url = resp.url
 
-    global finger_print
     finger_print = content_check.similar_check(content, finger_print)
     # get all the urls from the resp.url and initialize a return url_set
     links = soup.find_all('a')
     
-
     # update word count
     for word in re.findall(r'[A-Za-z0-9]+', content.lower()):
         if word in WordCount:
@@ -135,7 +131,7 @@ def extract_next_links(url, resp) -> list:
         else:
             WordCount[word] = 1
 
-    #update domain
+    # update domain
     single_domain = parsed.hostname
     if single_domain in domain:
         domain[single_domain] += 1
@@ -184,8 +180,9 @@ def is_valid(url):
     # There are already some conditions that return False.
     try:
         parsed = urlparse(url)
-
         # 直接换成一行，为什么我要写这么多if，这些真的有用吗？？？
+        # 隔壁罗老师把这么多东西改成了一大个if 嘿嘿
+        
         # Check whether scheme is http or https
         if parsed.scheme not in {"http", "https"}:
             return False
@@ -197,7 +194,7 @@ def is_valid(url):
             (not url_checker.check_exclude_url(url))):
                 return False
 
-        #given code
+        # given code
         return not re.match(FILE_EXTENSIONS, parsed.path.lower())
 
     except TypeError:
