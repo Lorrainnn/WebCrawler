@@ -75,7 +75,7 @@ def scraper(url, resp):
         print(str(e))
         return []
 
-def extract_next_links(url, resp):
+def extract_next_links(url, resp) -> list:
     # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
@@ -159,7 +159,7 @@ def extract_next_links(url, resp):
 
     # get all the urls from the resp.url and initialize a return url_set
     links = soup.find_all('a')
-    url_set = set()
+    
 
     # update word count
     for word in re.findall(r'[A-Za-z0-9]+', content.lower()):
@@ -175,9 +175,10 @@ def extract_next_links(url, resp):
     else:
         domain[single_domain] = 1
 
+    return list(process_links(links, url, resp))
 
-
-
+def process_links(links, url, resp) -> set:
+    url_set = set()
     #for all the url, we normalize it, check whether is_valid and add it to the return_list
     for link in links:
         href = link.get('href')
@@ -222,7 +223,7 @@ def extract_next_links(url, resp):
             depth[new_url] = depth[resp.url] + 1
 
     #return
-    return list(url_set)
+    return url_set
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
@@ -235,24 +236,6 @@ def is_valid(url):
         #check whether scheme is http or https
         if parsed.scheme not in {"http", "https"}:
             return False
-
-        # #check the domain
-        # if not url_checker.check_domain(url):
-        #     return False
-
-        # if not url_checker.check_length(url):
-        #     return False
-
-        # # check repeating file to avoid trap like in calender
-        # if not url_checker.check_repeating(url):
-        #     return False
-
-        # #check are we allowed to crawl
-        # if not url_checker.check_robots_txt(url):
-        #     return False
-
-        # if not url_checker.check_exclude_url(url):
-        #     return False
 
         if ((not url_checker.check_domain(url)) or # check the domain
             (not url_checker.check_length(url)) or 
