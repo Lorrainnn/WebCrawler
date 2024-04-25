@@ -101,6 +101,7 @@ def extract_next_links(url, resp) -> list:
     # check the robots.txt
     # first we get the url for robots.txt
 
+    parsed = urlparse(resp.url)
     if not resp_tools.robot_checker(url, resp):
         return []
         
