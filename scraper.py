@@ -100,17 +100,10 @@ def extract_next_links(url, resp) -> list:
         return []
     # check the robots.txt
     # first we get the url for robots.txt
-    parsed = urlparse(resp.url)
-    robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
-    # and build the robotfileparser
-    robot_parser = urllib.robotparser.RobotFileParser()
-    # set the url of robot parser to robots.txt
-    robot_parser.set_url(robot_url)
-    # read the allow
-    robot_parser.read()
-    # check whether we are able to get the content in robots.txt
-    if not robot_parser.can_fetch("IR US24 Our 39263968", url):
+
+    if not resp_tools.robot_checker(url, resp):
         return []
+        
 
     # #Find all the url in the html file
     # # Decode: first find out the content type of the raw_response, which is charset='someencode'
