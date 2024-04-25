@@ -1,5 +1,9 @@
 import re
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
+from urllib.parse import urljoin, unquote, urlencode, parse_qsl
+import urllib.robotparser
+from bs4 import BeautifulSoup
+import posixpath
 # set used to avoid repeat visiting a website
 visited = set()
 # count the number of bytes in the longest pages
@@ -86,8 +90,7 @@ def extract_next_links(url, resp):
     # first we get the url for robots.txt
     parsed = urlparse(resp.url)
     robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
-    # import robotparser and build the robotfileparser
-    import urllib.robotparser
+    # and build the robotfileparser
     robot_parser = urllib.robotparser.RobotFileParser()
     # set the url of robot parser to robots.txt
     robot_parser.set_url(robot_url)
@@ -98,7 +101,6 @@ def extract_next_links(url, resp):
         return []
 
     #Find all the url in the html file
-    from bs4 import BeautifulSoup
     # Decode: first find out the content type of the raw_response, which is charset='someencode'
     encode_information = resp.raw_response.headers.get("Content-Type").strip().split(';')
     # set the default to utf-8
@@ -170,7 +172,7 @@ def extract_next_links(url, resp):
         href = link.get('href')
 
         #combine the relative url and base url to absolute url
-        from urllib.parse import urljoin
+        
         abs_url = urljoin(url, href) if href else url
         parsed = urlparse(abs_url)
 
@@ -184,12 +186,12 @@ def extract_next_links(url, resp):
             new_netloc = new_netloc.replace(":443", "")
 
         # normalize the path
-        import posixpath
+
         new_path = posixpath.normpath(parsed.path)
 
         #sort the query
         #use unquote to decode the query
-        from urllib.parse import unquote, urlencode, parse_qsl
+        
         decoded_query = unquote(parsed.query)
         #make a list consisting of [key, value] pair
         key_value_querylist = parse_qsl(decoded_query, keep_blank_values = True)
@@ -199,7 +201,6 @@ def extract_next_links(url, resp):
         new_query = urlencode(sorted_query,doseq = True)
 
         #combine all the modified scheme, netloc, path, query with removing fragment to the new url
-        from urllib.parse import urlunparse
         new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
 
         #check whether the new url is visited, if not add it to our return url_set and visited set. set the depth of new_url = depth of resp.url + 1
