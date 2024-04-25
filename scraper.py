@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import urllib.robotparser
 import posixpath
 import url_checker
+import resp_tools
 
 # set used to avoid repeat visiting a website
 visited = set()
@@ -111,18 +112,21 @@ def extract_next_links(url, resp) -> list:
     if not robot_parser.can_fetch("IR US24 Our 39263968", url):
         return []
 
-    #Find all the url in the html file
-    # Decode: first find out the content type of the raw_response, which is charset='someencode'
-    encode_information = resp.raw_response.headers.get("Content-Type").strip().split(';')
-    # set the default to utf-8
-    encode = 'utf-8'
-    # if we find the page has its own encode, we replace encode with it
-    for single in encode_information:
-        if "charset=" in single:
-            charset_value = single.strip().split('=')[1].strip()
-            encode = charset_value.strip(' "\'')
-    # get the content by decoding
-    html_content = resp.raw_response.content.decode(encode)
+    # #Find all the url in the html file
+    # # Decode: first find out the content type of the raw_response, which is charset='someencode'
+    # encode_information = resp.raw_response.headers.get("Content-Type").strip().split(';')
+    # # set the default to utf-8
+    # encode = 'utf-8'
+    # # if we find the page has its own encode, we replace encode with it
+    # for single in encode_information:
+    #     if "charset=" in single:
+    #         charset_value = single.strip().split('=')[1].strip()
+    #         encode = charset_value.strip(' "\'')
+    # # get the content by decoding
+    # html_content = resp.raw_response.content.decode(encode)
+    
+    html_content = resp_tools.decode_content(resp)
+    
     #get the text and compute the length to check. if length =0 or too big, we don't access the url
     soup = BeautifulSoup(html_content, 'html.parser')
     content = soup.get_text()
