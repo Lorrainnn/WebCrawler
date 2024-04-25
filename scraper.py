@@ -6,6 +6,7 @@ import urllib.robotparser
 import posixpath
 import url_checker
 import resp_tools
+import content_check
 
 # set used to avoid repeat visiting a website
 visited = set()
@@ -98,30 +99,15 @@ def extract_next_links(url, resp) -> list:
         depth[resp.url] = 1
     elif depth[resp.url] > 10:
         return []
+
     # check the robots.txt
-    # first we get the url for robots.txt
-
-    parsed = urlparse(resp.url)
+    parsed = urlparse(resp.url) # for later use
     if not resp_tools.robot_checker(url, resp):
-        return []
-        
+        return [] # stops running if it receives false
 
-    # #Find all the url in the html file
-    # # Decode: first find out the content type of the raw_response, which is charset='someencode'
-    # encode_information = resp.raw_response.headers.get("Content-Type").strip().split(';')
-    # # set the default to utf-8
-    # encode = 'utf-8'
-    # # if we find the page has its own encode, we replace encode with it
-    # for single in encode_information:
-    #     if "charset=" in single:
-    #         charset_value = single.strip().split('=')[1].strip()
-    #         encode = charset_value.strip(' "\'')
-    # # get the content by decoding
-    # html_content = resp.raw_response.content.decode(encode)
-    
     html_content = resp_tools.decode_content(resp)
     
-    #get the text and compute the length to check. if length =0 or too big, we don't access the url
+    # get the text and compute the length to check. if length =0 or too big, we don't access the url
     soup = BeautifulSoup(html_content, 'html.parser')
     content = soup.get_text()
     length = int(resp.raw_response.headers.get("Content-Length", len(content)))
@@ -137,23 +123,25 @@ def extract_next_links(url, resp) -> list:
         longest_number = length
         longest_url = resp.url
 
-    # similarity system, we first generate a fingerprint by hash consecutive 3 words.
-    words = re.findall(r'[A-Za-z0-9]+', content.lower())
-    single_fg = []
-    for index in range(len(words) - 2):
-        single_list = [words[index], words[index + 1], words[index] + 2]
-        single_hash = hash("".join(single_list))
-        single_fg.append(single_hash)
-    #for every fingerprint we have, we compute the fingerprint using
-    # intersection / union. if similarity is bigger then 0.8, not access it.
-    global finger_print
-    for fg in finger_print:
-        intersection = len(set(single_fg).intersection(set(fg)))
-        union = len(set(single_fg).union(set(fg)))
-        if union != 0 and intersection * 1.0 / union > 0.8:
-            return []
-    # if valid, we append the new fingerprint to our fingerprint list
-    finger_print.append(single_fg)
+    # # similarity system, we first generate a fingerprint by hash consecutive 3 words.
+    # words = re.findall(r'[A-Za-z0-9]+', content.lower())
+    # single_fg = []
+    # for index in range(len(words) - 2):
+    #     single_list = [words[index], words[index + 1], words[index] + 2]
+    #     single_hash = hash("".join(single_list))
+    #     single_fg.append(single_hash)
+    # #for every fingerprint we have, we compute the fingerprint using
+    # # intersection / union. if similarity is bigger then 0.8, not access it.
+    # global finger_print
+    # for fg in finger_print:
+    #     intersection = len(set(single_fg).intersection(set(fg)))
+    #     union = len(set(single_fg).union(set(fg)))
+    #     if union != 0 and intersection * 1.0 / union > 0.8:
+    #         return []
+    # # if valid, we append the new fingerprint to our fingerprint list
+    # finger_print.append(single_fg)
+    
+    finger_print = content_check.similar_check(content, finger_print)
 
     # get all the urls from the resp.url and initialize a return url_set
     links = soup.find_all('a')
@@ -181,8 +169,7 @@ def process_links(links, url, resp) -> set:
     for link in links:
         href = link.get('href')
 
-        #combine the relative url and base url to absolute url
-        
+        #combine the relative url and base url to absolute url        
         abs_url = urljoin(url, href) if href else url
         parsed = urlparse(abs_url)
 
