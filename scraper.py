@@ -1,8 +1,6 @@
 import re
-from urllib.parse import urlparse, urlunparse
-from urllib.parse import urljoin, unquote, urlencode, parse_qsl
+from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
-import urllib.robotparser
 import posixpath
 import url_checker
 import resp_tools
@@ -165,32 +163,19 @@ def process_links(links, url, resp) -> set:
         if new_scheme == "https":
             new_netloc = new_netloc.replace(":443", "")
 
-        # normalize the path
-
-        new_path = posixpath.normpath(parsed.path)
-
         #sort the query
-        #use unquote to decode the query
+        new_url = content_check.query_cleaner(parsed, new_scheme, new_netloc, 
+                                              posixpath.normpath(parsed.path)) # normalizes the path
         
-        decoded_query = unquote(parsed.query)
-        #make a list consisting of [key, value] pair
-        key_value_querylist = parse_qsl(decoded_query, keep_blank_values = True)
-        #sort the key_value_list
-        sorted_query = sorted(key_value_querylist, key = lambda single:single[0])
-        #encode it back to query
-        new_query = urlencode(sorted_query,doseq = True)
-
-        #combine all the modified scheme, netloc, path, query with removing fragment to the new url
-        new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
-
-        #check whether the new url is visited, if not add it to our return url_set and visited set. set the depth of new_url = depth of resp.url + 1
+        # check whether the new url is visited, if not,
+        # add it to our return url_set and visited set. 
+        # set the depth of new_url = depth of resp.url + 1
         global visited
         if new_url not in visited and is_valid(new_url):
             url_set.add(new_url)
             visited.add(new_url)
             depth[new_url] = depth[resp.url] + 1
 
-    #return
     return url_set
 
 def is_valid(url):
@@ -200,8 +185,8 @@ def is_valid(url):
     try:
         parsed = urlparse(url)
 
-        #直接换成一行，为什么我要写这么多if，这些真的有用吗？？？
-        #check whether scheme is http or https
+        # 直接换成一行，为什么我要写这么多if，这些真的有用吗？？？
+        # Check whether scheme is http or https
         if parsed.scheme not in {"http", "https"}:
             return False
 

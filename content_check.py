@@ -1,4 +1,6 @@
 import re
+from urllib.parse import urlunparse, unquote, urlencode, parse_qsl
+
 def similar_check(content, current_fingerprint) -> list:
     # similarity system, we first generate a fingerprint by hash consecutive 3 words.
     words = re.findall(r'[A-Za-z0-9]+', content.lower())
@@ -18,3 +20,15 @@ def similar_check(content, current_fingerprint) -> list:
     current_fingerprint.append(single_fg)
     
     return current_fingerprint
+
+def query_cleaner(parsed, new_scheme, new_netloc, new_path):
+    decoded_query = unquote(parsed.query)
+    #make a list consisting of [key, value] pair
+    key_value_querylist = parse_qsl(decoded_query, keep_blank_values = True)
+    #sort the key_value_list
+    sorted_query = sorted(key_value_querylist, key = lambda single:single[0])
+    #encode it back to query
+    new_query = urlencode(sorted_query,doseq = True)
+
+    #combine all the modified scheme, netloc, path, query with removing fragment to the new url
+    return urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
