@@ -87,7 +87,7 @@ def extract_next_links(url, resp) -> list:
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
-
+    
     #check whether it has a valid link
     if not resp.status == 200:
         return []
@@ -99,11 +99,12 @@ def extract_next_links(url, resp) -> list:
         depth[resp.url] = 1
     elif depth[resp.url] > 10:
         return []
-
+    
+    
     # check the robots.txt
     parsed = urlparse(resp.url) # for later use
-    if not resp_tools.robot_checker(url, resp):
-        return [] # stops running if it receives false
+    if resp_tools.robot_checker(url, resp):
+        return [] # stops running if it receives false    
 
     html_content = resp_tools.decode_content(resp)
     
@@ -123,26 +124,8 @@ def extract_next_links(url, resp) -> list:
         longest_number = length
         longest_url = resp.url
 
-    # # similarity system, we first generate a fingerprint by hash consecutive 3 words.
-    # words = re.findall(r'[A-Za-z0-9]+', content.lower())
-    # single_fg = []
-    # for index in range(len(words) - 2):
-    #     single_list = [words[index], words[index + 1], words[index] + 2]
-    #     single_hash = hash("".join(single_list))
-    #     single_fg.append(single_hash)
-    # #for every fingerprint we have, we compute the fingerprint using
-    # # intersection / union. if similarity is bigger then 0.8, not access it.
-    # global finger_print
-    # for fg in finger_print:
-    #     intersection = len(set(single_fg).intersection(set(fg)))
-    #     union = len(set(single_fg).union(set(fg)))
-    #     if union != 0 and intersection * 1.0 / union > 0.8:
-    #         return []
-    # # if valid, we append the new fingerprint to our fingerprint list
-    # finger_print.append(single_fg)
-    
+    global finger_print
     finger_print = content_check.similar_check(content, finger_print)
-
     # get all the urls from the resp.url and initialize a return url_set
     links = soup.find_all('a')
     
@@ -160,7 +143,7 @@ def extract_next_links(url, resp) -> list:
         domain[single_domain] += 1
     else:
         domain[single_domain] = 1
-
+    
     return list(process_links(links, url, resp))
 
 def process_links(links, url, resp) -> set:

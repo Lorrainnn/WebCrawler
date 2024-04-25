@@ -24,4 +24,4 @@ def robot_checker(url, resp):
     robot_parser.read()
     # check whether we are able to get the content in robots.txt
     if not robot_parser.can_fetch("IR US24 Our 39263968", url):
-        return False
+        return True
