@@ -1,0 +1,275 @@
+Longest page: https://swiki.ics.uci.edu/doku.php/commands:screen?difftype=sidebyside&do=diff&rev=1453500286
+Number of words: 1584
+
+
+
+
+
+
+    screen    [support wiki]
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+skip to content
+
+
+
+
+
+
+          [[screen]]
+        
+
+support wiki 
+
+
+trace: 
+
+
+
+show page 
+
+recent changessitemaplog in 
+
+
+search 
+
+differences
+
+
+this shows you the differences between two versions of the page.
+
+
+
+
+view differences: 
+side by sideinline
+
+go
+
+
+link to this comparison view
+
+
+
+
+
+both sides previous revision
+previous revision
+
+ 
+2022/02/17 16:45 dutran [tips for large jobs] 2022/02/17 16:37 dutran [creating new terminals/tabs] 2022/02/17 16:33 dutran [tips for large jobs] 2016/02/02 12:11 dutran 2016/02/02 12:10 dutran 2016/02/02 12:07  external edit2016/01/22 16:38 hans [simple example] 2016/01/22 16:37 jarmentr [simple example] 2016/01/22 16:36 jarmentr [create/re-attach screen session] 2016/01/22 16:27 jarmentr [simple example] 2016/01/22 16:18 jarmentr [simple example] 2016/01/22 16:13 jarmentr 2016/01/22 16:12 jarmentr 2016/01/22 16:11 jarmentr 2016/01/22 15:52 jarmentr [killing] 2016/01/22 15:52 jarmentr [detaching] 2016/01/22 15:52 jarmentr [create/re-attach screen session] 2016/01/22 15:51 jarmentr [create/re-attach screen session] 2016/01/22 15:50 jarmentr [detaching] 2016/01/22 15:50 jarmentr [killing] 2016/01/22 15:46 jarmentr [create/re-attach screen session] 2016/01/22 15:38 jarmentr 2016/01/22 15:17 jarmentr 2016/01/22 14:58 jarmentr 2016/01/22 14:57 jarmentr 2016/01/22 14:56 jarmentr 2016/01/22 14:51 jarmentr 2016/01/22 14:50 jarmentr 2016/01/22 14:45 jarmentr 2016/01/22 14:44 jarmentr 2016/01/22 14:42 jarmentr 2016/01/22 14:25 hans 2016/01/22 14:20 jarmentr 2016/01/22 14:19 jarmentr 2016/01/22 14:18 jarmentr 2016/01/22 14:14 jarmentr 2016/01/22 14:13 jarmentr [screen overview] 2016/01/22 14:12 jarmentr [simple use example] 2016/01/22 14:04 jarmentr 2016/01/22 14:00 jarmentr [simple use example] 2016/01/22 14:00 jarmentr [simple use example] 2016/01/22 13:51 jarmentr 2016/01/22 13:49 jarmentr 2016/01/22 13:47 jarmentr 2016/01/22 13:46 jarmentr 2016/01/22 13:43 jarmentr 2016/01/22 13:32 jarmentr 2016/01/22 13:21 jarmentr 2016/01/22 13:20 jarmentr created2016/01/22 12:23 jarmentr removed2016/01/22 12:23 jarmentr created
+
+go
+
+next revision
+
+previous revision
+
+ 
+2022/02/17 16:45 dutran [tips for large jobs] 2022/02/17 16:37 dutran [creating new terminals/tabs] 2022/02/17 16:33 dutran [tips for large jobs] 2016/02/02 12:11 dutran 2016/02/02 12:10 dutran 2016/02/02 12:07  external edit2016/01/22 16:38 hans [simple example] 2016/01/22 16:37 jarmentr [simple example] 2016/01/22 16:36 jarmentr [create/re-attach screen session] 2016/01/22 16:27 jarmentr [simple example] 2016/01/22 16:18 jarmentr [simple example] 2016/01/22 16:13 jarmentr 2016/01/22 16:12 jarmentr 2016/01/22 16:11 jarmentr 2016/01/22 15:52 jarmentr [killing] 2016/01/22 15:52 jarmentr [detaching] 2016/01/22 15:52 jarmentr [create/re-attach screen session] 2016/01/22 15:51 jarmentr [create/re-attach screen session] 2016/01/22 15:50 jarmentr [detaching] 2016/01/22 15:50 jarmentr [killing] 2016/01/22 15:46 jarmentr [create/re-attach screen session] 2016/01/22 15:38 jarmentr 2016/01/22 15:17 jarmentr 2016/01/22 14:58 jarmentr 2016/01/22 14:57 jarmentr 2016/01/22 14:56 jarmentr 2016/01/22 14:51 jarmentr 2016/01/22 14:50 jarmentr 2016/01/22 14:45 jarmentr 2016/01/22 14:44 jarmentr 2016/01/22 14:42 jarmentr 2016/01/22 14:25 hans 2016/01/22 14:20 jarmentr 2016/01/22 14:19 jarmentr 2016/01/22 14:18 jarmentr 2016/01/22 14:14 jarmentr 2016/01/22 14:13 jarmentr [screen overview] 2016/01/22 14:12 jarmentr [simple use example] 2016/01/22 14:04 jarmentr 2016/01/22 14:00 jarmentr [simple use example] 2016/01/22 14:00 jarmentr [simple use example] 2016/01/22 13:51 jarmentr 2016/01/22 13:49 jarmentr 2016/01/22 13:47 jarmentr 2016/01/22 13:46 jarmentr 2016/01/22 13:43 jarmentr 2016/01/22 13:32 jarmentr 2016/01/22 13:21 jarmentr 2016/01/22 13:20 jarmentr created2016/01/22 12:23 jarmentr removed2016/01/22 12:23 jarmentr created
+
+go
+
+
+
+
+
+commands:screen [2016/01/22 14:12]jarmentr [simple use example]  
+
+commands:screen [2022/02/17 16:45] (current)dutran [tips for large jobs]  
+
+line 1:
+line 1:
+
+-====== ​  ​======+======= screen =======
+  
+-====== screen ​overview ​======+===== useful links and sources ​===== 
+ + 
+ +[[https://​www.gnu.org/​software/​screen/​manual/​screen.html|www.gnu.org/​software/​screen/​manual/​screen.html]] 
+ + 
+ +[[http://​www.tecmint.com/​screen-command-examples-to-manage-linux-terminals/​|www.tecmint.com/​screen-command-examples-to-manage-linux-terminals/​]] 
+ + 
+ +===== screen overview ​=====
+  
+ screen is a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells. screen is a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells.
+line 7:
+line 13:
+
+ each virtual terminal provides the same functions of the usual terminal. there is a scrollback history buffer for each virtual terminal and a copy-and-paste mechanism that allows the user to move text regions between windows. each virtual terminal provides the same functions of the usual terminal. there is a scrollback history buffer for each virtual terminal and a copy-and-paste mechanism that allows the user to move text regions between windows.
+  
+-when screen is called, it creates a single window with a shell and the gets out of your way so that you can use the program as you normally would. then, at any time, you can create new (full-screen) windows with other programs in them (including more shells), kill the current window, view a list of the active windows, turn output logging on and off, copy text between windows, view the scrollback history, etc. all windows run their programs completely independent of each other. **screen allows p****rograms continue to run when the window is currently not visible** and even when the whole screen session is detached from the user's terminal.+when screen is called, it creates a single window with a shell and the gets out of your way so that you can use the program as you normally would. then, at any time, you can create new (full-screen) windows with other programs in them (including more shells), kill the current window, view a list of the active windows, turn output logging on and off, copy text between windows, view the scrollback history, etc. all windows run their programs completely independent of each other. **screen allows p****rograms ​to continue to run when the window is currently not visible** and even when the whole screen session is detached from the user's terminal.
+  
+ when a program terminates, screen (per default) kills the window that contained it. if this window was in the foreground, the display switches to the previously displayed window; if none are left, screen exits. when a program terminates, screen (per default) kills the window that contained it. if this window was in the foreground, the display switches to the previously displayed window; if none are left, screen exits.
+  
+-====== simple use example ======+===== create/​re-attach screen session ​=====
+  
+-====== ​  ​======+create a screen with the parameters x and r
+  
+-open an ssh connection and __//​**remember** // __ the host you are on +<code bash>​$ ​screen -xr
+-<code bash>​$ ​hostname+
+ </​code>​ </​code>​
+  
+-====== ​  ​======+**-x** will attach to a not detached screen, for multi display mode.
+  
+-====== ​  ​======+**-r** wil resume the last detached screen session. if one doesn'​t exist, it will start a new session. 
+ + 
+ +for more command parameters use 
+ + 
+ +<code bash>$ screen -help 
+ +</​code>​ 
+ + 
+ +while in the screen, you can press **ctrl + a**, then **?** to view all available commands 
+ + 
+ +===== leaving screen session ​===== 
+ + 
+ +==== detaching ==== 
+ + 
+ +detaching the page will allow you to leave the session without quitting the process 
+ + 
+ +press **ctrl + a**, then **d** 
+ +==== killing ==== 
+ + 
+ +killing a screen will also kill any process it is running 
+ + 
+ +press **ctrl + a**, then **k** 
+ + 
+ +===== simple example ===== 
+ + 
+ +open an ssh connection and **remember ** the host you are on 
+ + 
+ +<code bash> 
+ +$ hostname 
+ +ramon-limon 
+ +</​code>​
+  
+ create a new screen instance create a new screen instance
+line 28:
+line 62:
+
+  $ screen -xr  $ screen -xr
+ </​code>​ </​code>​
+- 
+-====== ​  ​====== 
+- 
+-====== ​  ​====== 
+  
+ create a bash script to run a job in the background, below is a script that will print every 10 seconds, 100 times. create a bash script to run a job in the background, below is a script that will print every 10 seconds, 100 times.
+line 37:
+line 67:
+
+ <code bash>$ vim test.sh <code bash>$ vim test.sh
+ </​code>​ </​code>​
+- 
+-====== ​  ​====== 
+  
+ <code bash>#​!/​bin/​bash <code bash>#​!/​bin/​bash
+line 62:
+line 90:
+
+ </​code>​ </​code>​
+  
+-you should ​now start to see the script running, now to test wether it continues after exit. again,​**//​please remember the hostname// ** of the system you are running the job on. to exit the screen, press ctrl-a, then press d. you can re-enter the screen by again running the command <code bash>$ screen -xr</​code>​+you should see the script running, now to test wether it continues after exit. again, **//please remember the hostname// ** of the system you are running the job on. to exit the screen, press ctrl-a, then press d. you can re-enter the screen by again running the command 
+ +<code bash>$ screen -xr 
+ +</​code>​
+  
+ now try closing out the shell and reconnecting to the host at [whatever hostname].ics.uci.edu. if you run the screen command again, you will find that your process is still running! now try closing out the shell and reconnecting to the host at [whatever hostname].ics.uci.edu. if you run the screen command again, you will find that your process is still running!
+  
+-====== ​useful links and sources ​======+===== creating new terminals/​tabs ​===== 
+ + 
+ +to create a tab inside of screen on the same server, ctrl-a + c would create it.  there is a way of creating a new tab but on a different host.  copy the follow contents to a file called '​sssh.sh':​ 
+ + 
+ +<​code>​ 
+ +#!/bin/sh 
+ + 
+ +screen -t ${1} ssh -x ${1} 
+ +</​code>​ 
+ + 
+ +next, if your shell is bash, edit your .bashrc file and add the following alias: 
+ + 
+ +  alias sssh="/​home/​icsuser/​sssh.sh"​ 
+ +   
+ +make sure the path to the file is correct. ​ run "​source .bashrc"​ to reload the file and run: 
+ + 
+ +  sssh openlab.ics.uci.edu 
+ + 
+ +it will create a new screen tab on a new host. 
+ +===== .screenrc file ===== 
+ + 
+ +here is an of a .screenrc file to put at the root of your home directory. 
+ + 
+ +<​code>​ 
+ +deflogin off 
+ +#screen -t shell 0 bash 
+ +#screen -t emacs 1 /​usr/​bin/​emacs -nw 
+ +select 0 
+ +#vbell on 
+ +#change the hardstatus settings to give an window list at the bottom of the 
+ +#screen, with the time and date and with the current window highlighted 
+ +hardstatus alwayslastline 
+ +#hardstatus string '%{= mk}%-lw%{= kw}%50>​%n%f* %t%{= mk}%+lw%<​ %{= kg}' 
+ +#hardstatus string '%{= kg}%-lw%{= kw}%50> %n%f* %t%{= kg}%+lw%<​ %{= kg}' 
+ +hardstatus string "%{= ky}%-lw%{=r}%20>​%n %t%{= ky}%+lw %{= ky}%-=| %{= kw}%m%d %c%{-} %{=r} ${user}@%h " 
+ +multiuser on 
+ +aclchg :window: +x select 
+ +attrcolor b "​.i"​ 
+ +termcapinfo xterm '​co#​256:​ab=\e[48;​5;​%dm:​af=\e[38;​5;​%dm'​ 
+ +defbce "​on"​ 
+ +</​code>​ 
+ + 
+ +===== tips for large jobs ===== 
+ + 
+ +    * remember the hostname 
+ +    * don't have it running endlessly, have some sort of time constraint. 
+ +    * get updates on the job's progress. this can be done with email, logs, etc.
+  
+-[[https://​www.gnu.org/​software/​screen/​manual/​screen.html|www.gnu.org/​software/​screen/​manual/​screen.html]] 
+  
+
+
+
+
+
+
+
+
+commands/screen.1453500755.txt.gz · last modified: 2016/01/22 14:12 by jarmentr 
+
+
+
+
+
+show pageold revisions 
+
+media managerback to top 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
