@@ -6,6 +6,8 @@ import url_checker
 import resp_tools
 import content_check
 
+not_allowed = set()
+visited_page = 0
 # set used to avoid repeat visiting a website
 visited = set()
 # count the number of bytes in the longest pages
@@ -50,18 +52,19 @@ FILE_EXTENSIONS = (r".*\.(css|js|bmp|gif|jpe?g|ico"
                 + r"|epub|dll|cnf|tgz|sha1"
                 + r"|thmx|mso|arff|rtf|jar|csv"
                 + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$")
-
 def printall():
     # print and write file
     print("Longest url: " + longest_url)
     print("longest_number: ", end = '')
     print(longest_number)
-    print(dict(sorted(WordCount.items(), key = lambda single: (single[1], single[0]))))
+    #print(dict(sorted(WordCount.items(), key = lambda single: (single[1], single[0]))))
     print(domain)
+    print(visited)
     with open("result.txt", "w") as file1:
+        file1.write("Visted page number: " + str(visited_page) + "\n")
         file1.write("longest_number: " + str(longest_number) + "\n")
         file1.write("longest_number: " + longest_url + "\n")
-        for key,value in dict(sorted(WordCount.items(), key = lambda single: (single[1], single[0]))).items():
+        for key,value in dict(sorted(WordCount.items(), key = lambda single: (single[1], single[0]), )).items():
             file1.write(key + " ->" + str(value) + '\n')
         for key,value in domain.items():
             file1.write(key + " " + str(value) + '\n')
@@ -86,9 +89,10 @@ def extract_next_links(url, resp) -> list:
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
-    
-    #check whether it has a valid link
+
+    # check whether it has a valid link
     if resp.status != 200:
+        print("Web status is not 200")
         return []
 
     # Keep track of depth. if depth > 10, we will not visit it anymore. 
@@ -97,21 +101,26 @@ def extract_next_links(url, resp) -> list:
     global depth
     if resp.url not in depth:
         depth[resp.url] = 1
-    elif depth[resp.url] > 10:
+    elif depth[resp.url] > 20:
+        print("It's a trap!")
         return []
-    
     # check the robots.txt
-    parsed = urlparse(resp.url) # for later use
+    # first we get the url for robots.txt
+    parsed = urlparse(resp.url)
+    #Find all the url in the html file
     if resp_tools.robot_checker(url, resp):
         return [] # stops running if it receives false    
 
     html_content = resp_tools.decode_content(resp)
-    
-    # get the text and compute the length to check. if length =0 or too big, we don't access the url
+    #get the text and compute the length to check. if length =0 or too big, we don't access the url
     soup = BeautifulSoup(html_content, 'html.parser')
     content = soup.get_text()
     length = int(resp.raw_response.headers.get("Content-Length", len(content)))
-    if length == 0 or length >= 1000000:
+    if length == 0:
+        print("empty file")
+        return []
+    if length >= 1000000:
+        print("too large")
         return []
 
     #update the longest_url_website
@@ -123,7 +132,9 @@ def extract_next_links(url, resp) -> list:
     finger_print = content_check.similar_check(content, finger_print)
     # get all the urls from the resp.url and initialize a return url_set
     links = soup.find_all('a')
-    
+    global urlset
+    urlset = set()
+
     # update word count
     for word in re.findall(r'[A-Za-z0-9]+', content.lower()):
         if word in WordCount:
@@ -137,16 +148,17 @@ def extract_next_links(url, resp) -> list:
         domain[single_domain] += 1
     else:
         domain[single_domain] = 1
-    
-    return list(process_links(links, url, resp))
+    global visited_page
+    visited_page += 1
+    # print("Successfully crawled with encode of " + encode)
+    return process_links(links, url, resp, urlset)
 
-def process_links(links, url, resp) -> set:
-    url_set = set()
+def process_links(links, url, resp, url_set) -> list:
     #for all the url, we normalize it, check whether is_valid and add it to the return_list
     for link in links:
         href = link.get('href')
 
-        #combine the relative url and base url to absolute url        
+        #combine the relative url and base url to absolute url
         abs_url = urljoin(url, href) if href else url
         parsed = urlparse(abs_url)
 
@@ -159,45 +171,81 @@ def process_links(links, url, resp) -> set:
         if new_scheme == "https":
             new_netloc = new_netloc.replace(":443", "")
 
+        # normalize the path
+        new_path = posixpath.normpath(parsed.path)
+
         #sort the query
-        new_url = content_check.query_cleaner(parsed, new_scheme, new_netloc, 
-                                              posixpath.normpath(parsed.path)) # normalizes the path
-        
-        # check whether the new url is visited, if not,
-        # add it to our return url_set and visited set. 
-        # set the depth of new_url = depth of resp.url + 1
+        #use unquote to decode the query
+        from urllib.parse import unquote, urlencode, parse_qsl
+        decoded_query = unquote(parsed.query)
+        #make a list consisting of [key, value] pair
+        key_value_querylist = parse_qsl(decoded_query, keep_blank_values = True)
+        #sort the key_value_list
+        sorted_query = sorted(key_value_querylist, key = lambda single:single[0])
+        #encode it back to query
+        new_query = urlencode(sorted_query,doseq = True)
+
+        #combine all the modified scheme, netloc, path, query with removing fragment to the new url
+        from urllib.parse import urlunparse
+        new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
+
+        #check whether the new url is visited, if not add it to our return url_set and visited set. set the depth of new_url = depth of resp.url + 1
         global visited
         if new_url not in visited and is_valid(new_url):
             url_set.add(new_url)
             visited.add(new_url)
             depth[new_url] = depth[resp.url] + 1
 
-    return url_set
+    #return
+    global urlset
+    urlset = url_set
+    return list(url_set)
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
     try:
+        global not_allowed
+        if url in not_allowed:
+            return False
         parsed = urlparse(url)
-        # 直接换成一行，为什么我要写这么多if，这些真的有用吗？？？
-        # 隔壁罗老师把这么多东西改成了一大个if 嘿嘿
-        
-        # Check whether scheme is http or https
-        if parsed.scheme not in {"http", "https"}:
+
+        #check whether scheme is http or https
+        if parsed.scheme not in set(["http", "https"]):
             return False
 
-        if ((not url_checker.check_domain(url)) or # check the domain
-            (not url_checker.check_length(url)) or 
-            (not url_checker.check_repeating(url)) or # check repeating file to avoid trap like in calender
-            (not url_checker.check_robots_txt(url)) or # check are we allowed to crawl
-            (not url_checker.check_exclude_url(url))):
-                return False
+        #check the domain
+        if not parsed.netloc.endswith(".informatics.uci.edu") and not parsed.netloc.endswith(".ics.uci.edu") and not parsed.netloc.endswith(".cs.uci.edu") and not parsed.netloc.endswith(".stat.uci.edu"):
+            return False
 
-        # given code
+        # no calendar, stayconnected. pdf
+        if "calendar" in url or "stayconnected" in url:
+            return  False
+
+        # no len > 300 url
+        if len(url) > 300:
+            return False
+		
+        robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
+        # import robotparser and build the robotfileparser
+        import urllib.robotparser
+        robot_parser = urllib.robotparser.RobotFileParser()
+        # set the url of robot parser to robots.txt
+        robot_parser.set_url(robot_url)
+        # read the allow
+        robot_parser.read()
+        # check whether we are able to get the content in robots.txt
+        if not robot_parser.can_fetch("IR US24 Our 39263968", url):
+            print("robots.txt not allow access to " + url)
+            not_allowed.add(url)
+            return False
+
+
+        #given code
         return not re.match(FILE_EXTENSIONS, parsed.path.lower())
 
     except TypeError:
         print ("TypeError for ", urlparse(url))
-        raise
+        return True
 
