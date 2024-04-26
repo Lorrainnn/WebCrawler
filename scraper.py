@@ -54,17 +54,21 @@ FILE_EXTENSIONS = (r".*\.(css|js|bmp|gif|jpe?g|ico"
                 + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$")
 def printall():
     # print and write file
-    print("Longest url: " + longest_url)
-    print("longest_number: ", end = '')
+    print("Longest page url: " + longest_url)
+    print("Number of tokens: ", end = '')
     print(longest_number)
     #print(dict(sorted(WordCount.items(), key = lambda single: (single[1], single[0]))))
+    
     print(domain)
     print(visited)
+    
     with open("result.txt", "w") as file1:
         file1.write("Visted page number: " + str(visited_page) + "\n")
         file1.write("longest_number: " + str(longest_number) + "\n")
         file1.write("longest_number: " + longest_url + "\n")
-        for key,value in dict(sorted(WordCount.items(), key = lambda single: (single[1], single[0]), )).items():
+        top_50 = sorted(WordCount.items(), key=lambda x: x[1], reverse=True)[:50]
+        
+        for key,value in top_50:
             file1.write(key + " ->" + str(value) + '\n')
         for key,value in domain.items():
             file1.write(key + " " + str(value) + '\n')
