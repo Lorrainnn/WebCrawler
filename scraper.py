@@ -2,7 +2,6 @@ import re
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 import posixpath
-from url_checker import *
 import resp_tools
 import content_check
 import urllib.robotparser
@@ -212,10 +211,29 @@ def is_valid(url):
     # There are already some conditions that return False.
     try:
         global not_allowed
+        if url in not_allowed:
+            return False
         parsed = urlparse(url)
-  
+
+        #check whether scheme is http or https
+        if parsed.scheme not in set(["http", "https"]):
+            return False
+
+        #check the domain
+        if not parsed.netloc.endswith(".informatics.uci.edu") and not parsed.netloc.endswith(".ics.uci.edu") and not parsed.netloc.endswith(".cs.uci.edu") and not parsed.netloc.endswith(".stat.uci.edu"):
+            return False
+
+        # no calendar, stayconnected. pdf
+        if "calendar" in url or "stayconnected" in url:
+            return  False
+
+        # no len > 300 url
+        if len(url) > 300:
+            return False
+		
         robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
-        # build the robotfileparser
+        # import robotparser and build the robotfileparser
+        import urllib.robotparser
         robot_parser = urllib.robotparser.RobotFileParser()
         # set the url of robot parser to robots.txt
         robot_parser.set_url(robot_url)
@@ -227,13 +245,12 @@ def is_valid(url):
             not_allowed.add(url)
             return False
 
+
         #given code
-        return (check_not_allowed(not_allowed, url) 
-                and check_calendar(url) and check_length(url) 
-                and check_valid_scheme(parsed) and check_domain(parsed) 
-                and not re.match(FILE_EXTENSIONS, parsed.path.lower()))
+        return not re.match(FILE_EXTENSIONS, parsed.path.lower())
 
     except TypeError:
         print ("TypeError for ", urlparse(url))
+        return True
         
 
