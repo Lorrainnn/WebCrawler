@@ -5,6 +5,12 @@ import posixpath
 import resp_tools
 import content_check
 import urllib.robotparser
+from difflib import SequenceMatcher
+
+
+#example
+checkSimilar = []
+
 
 not_allowed = set()
 visited_page = 0
@@ -102,12 +108,20 @@ def extract_next_links(url, resp) -> list:
     # Keep track of depth. if depth > 10, we will not visit it anymore. 
     # Here is how depth works: if we have 5 websites: a b c and a has b link (a ->b)
     # b has c link (b ->c), then depth of a =1 , depth of b =1, depth of c =1
+    
     global depth
     if resp.url not in depth:
         depth[resp.url] = 1
     elif depth[resp.url] > 20:
         print("It's a trap!")
         return []
+    
+
+    
+    
+    
+    
+    
     # check the robots.txt
     # first we get the url for robots.txt
     parsed = urlparse(resp.url)
@@ -119,6 +133,11 @@ def extract_next_links(url, resp) -> list:
     #get the text and compute the length to check. if length =0 or too big, we don't access the url
     soup = BeautifulSoup(html_content, 'html.parser')
     content = soup.get_text()
+    
+    #temp
+    with open('process.txt', 'a', encoding = "utf-8") as w:
+        w.write(f"{url}\n")
+            
     length = int(resp.raw_response.headers.get("Content-Length", len(content)))
     if length == 0:
         print("empty file")
@@ -195,6 +214,7 @@ def process_links(links, url, resp, url_set) -> list:
 
         #check whether the new url is visited, if not add it to our return url_set and visited set. set the depth of new_url = depth of resp.url + 1
         global visited
+     
         if new_url not in visited and is_valid(new_url):
             url_set.add(new_url)
             visited.add(new_url)
@@ -230,10 +250,25 @@ def is_valid(url):
         # no len > 300 url
         if len(url) > 300:
             return False
+        
+        global checkSimilar
+
+        #check for dynamic url/history based traps
+        if (('?' in url) or ('&' in url)) and ('=' in url):
+            checkSimilar.append(urlparse(url).query)
+            if len(checkSimilar) > 1:
+                for q in checkSimilar[:-1]:
+                    if SequenceMatcher(None, q, urlparse(url).query).ratio() > 0.8 and compare_content_similarity(q, url):
+
+                        with open('trap.txt', 'a', encoding = "utf-8") as w:
+                            w.write(f"{url}\n")
+                        return False
+    
+
+ 
 		
         robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
-        # import robotparser and build the robotfileparser
-        import urllib.robotparser
+        # build the robotfileparser
         robot_parser = urllib.robotparser.RobotFileParser()
         # set the url of robot parser to robots.txt
         robot_parser.set_url(robot_url)
@@ -242,6 +277,8 @@ def is_valid(url):
         # check whether we are able to get the content in robots.txt
         if not robot_parser.can_fetch("IR US24 Our 39263968", url):
             print("robots.txt not allow access to " + url)
+            with open('no_permission.txt', 'a', encoding = "utf-8") as w:
+                w.write(f"{url}\n")
             not_allowed.add(url)
             return False
 
@@ -252,5 +289,39 @@ def is_valid(url):
     except TypeError:
         print ("TypeError for ", urlparse(url))
         return True
-        
+   
 
+def get_webpage_text(url):
+    try:
+        # Parse the URL
+        parsed_url = urlparse(url)
+        
+        # Open the URL and read the HTML content
+        with urllib.request.urlopen(url) as response:
+            html_content = response.read()
+        
+        # Create BeautifulSoup object to parse HTML
+        soup = BeautifulSoup(html_content, 'html.parser')
+        
+        # Extract text content from the webpage
+        text_content = soup.get_text()
+        
+        return text_content
+    except Exception as e:
+        print(f"Error fetching content from {url}: {e}")
+        return None
+
+def compare_content_similarity(url1, url2):
+    # Get text content from each URL
+    text1 = get_webpage_text(url1)
+    text2 = get_webpage_text(url2)
+
+    if text1 is not None and text2 is not None:
+        # Calculate similarity ratio using SequenceMatcher
+        similarity_ratio = SequenceMatcher(None, text1, text2).ratio()
+        return similarity_ratio<0.92
+    else:
+        return True
+    
+
+        
