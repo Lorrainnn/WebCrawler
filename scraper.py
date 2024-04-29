@@ -6,7 +6,8 @@ import resp_tools
 import content_check
 import urllib.robotparser
 from difflib import SequenceMatcher
-
+from urllib.parse import unquote, urlencode, parse_qsl
+from urllib.parse import urlunparse
 
 #example
 checkSimilar = []
@@ -59,23 +60,17 @@ FILE_EXTENSIONS = (r".*\.(css|js|bmp|gif|jpe?g|ico"
                 + r"|thmx|mso|arff|rtf|jar|csv"
                 + r"|rm|smil|wmv|swf|wma|zip|rar|gz)([\?#].*)?$")
 def printall():
-    # print and write file
-    print("Longest page url: " + longest_url)
-    print("Number of tokens: ", end = '')
-    print(longest_number)
-    #print(dict(sorted(WordCount.items(), key = lambda single: (single[1], single[0]))))
-    
-    print(domain)
-    print(visited)
-    
+ 
     with open("result.txt", "w") as file1:
         file1.write("Visted page number: " + str(visited_page) + "\n")
-        file1.write("longest_number: " + str(longest_number) + "\n")
-        file1.write("longest_number: " + longest_url + "\n")
-        top_50 = sorted(WordCount.items(), key=lambda x: x[1], reverse=True)[:50]
+        file1.write("Longest page url: " + longest_url + "\n")
+        file1.write("Number of tokens: " + str(longest_number) + "\n")
         
-        for key,value in top_50:
+        top_100 = sorted(WordCount.items(), key=lambda x: x[1], reverse=True)[:100]
+        
+        for key,value in top_100:
             file1.write(key + " ->" + str(value) + '\n')
+        file1.write('\n')
         for key,value in domain.items():
             file1.write(key + " " + str(value) + '\n')
 
@@ -120,8 +115,6 @@ def extract_next_links(url, resp) -> list:
     
     
     
-    
-    
     # check the robots.txt
     # first we get the url for robots.txt
     parsed = urlparse(resp.url)
@@ -137,8 +130,9 @@ def extract_next_links(url, resp) -> list:
     #temp
     with open('process.txt', 'a', encoding = "utf-8") as w:
         w.write(f"{url}\n")
-            
-    length = int(resp.raw_response.headers.get("Content-Length", len(content)))
+    
+    words = re.findall(r'[A-Za-z0-9]+', content.lower())
+    length = len(words)
     if length == 0:
         print("empty file")
         return []
@@ -155,15 +149,16 @@ def extract_next_links(url, resp) -> list:
     finger_print = content_check.similar_check(content, finger_print)
     # get all the urls from the resp.url and initialize a return url_set
     links = soup.find_all('a')
-    global urlset
-    urlset = set()
+    url_set = set()
 
+    global stop_word
     # update word count
-    for word in re.findall(r'[A-Za-z0-9]+', content.lower()):
-        if word in WordCount:
-            WordCount[word] += 1
-        else:
-            WordCount[word] = 1
+    for word in words:
+        if word not in stop_word:
+            if word in WordCount:
+                WordCount[word] += 1
+            else:
+                WordCount[word] = 1
 
     # update domain
     single_domain = parsed.hostname
@@ -173,10 +168,7 @@ def extract_next_links(url, resp) -> list:
         domain[single_domain] = 1
     global visited_page
     visited_page += 1
-    # print("Successfully crawled with encode of " + encode)
-    return process_links(links, url, resp, urlset)
-
-def process_links(links, url, resp, url_set) -> list:
+    
     #for all the url, we normalize it, check whether is_valid and add it to the return_list
     for link in links:
         href = link.get('href')
@@ -199,7 +191,6 @@ def process_links(links, url, resp, url_set) -> list:
 
         #sort the query
         #use unquote to decode the query
-        from urllib.parse import unquote, urlencode, parse_qsl
         decoded_query = unquote(parsed.query)
         #make a list consisting of [key, value] pair
         key_value_querylist = parse_qsl(decoded_query, keep_blank_values = True)
@@ -209,20 +200,15 @@ def process_links(links, url, resp, url_set) -> list:
         new_query = urlencode(sorted_query,doseq = True)
 
         #combine all the modified scheme, netloc, path, query with removing fragment to the new url
-        from urllib.parse import urlunparse
         new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
 
         #check whether the new url is visited, if not add it to our return url_set and visited set. set the depth of new_url = depth of resp.url + 1
         global visited
-     
         if new_url not in visited and is_valid(new_url):
             url_set.add(new_url)
             visited.add(new_url)
             depth[new_url] = depth[resp.url] + 1
 
-    #return
-    global urlset
-    urlset = url_set
     return list(url_set)
 
 def is_valid(url):
