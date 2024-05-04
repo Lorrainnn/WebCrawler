@@ -1,16 +1,18 @@
 import requests
 import cbor
 import time
+import ssl
 
 from utils.response import Response
 
+
 def download(url, config, logger=None):
-    
+    #ssl._create_default_https_context = ssl._create_unverified_context
     host, port = config.cache_server
     #delete after
     resp = requests.get(
         f"http://{host}:{port}/",
-        params=[("q", f"{url}"), ("u", f"{config.user_agent}")],verify=False)
+        params=[("q", f"{url}"), ("u", f"{config.user_agent}")])
     try:
         if resp and resp.content:
             return Response(cbor.loads(resp.content))

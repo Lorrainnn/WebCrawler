@@ -1,0 +1,153 @@
+1: How many unique pages did you find?
+
+Depends on how we interprete on "unique page"
+
+In total we find 28470 unique page passed the is_valid() test
+
+However, only 10627 page are actually crawled after test on response status/trap recognition/similarity test
+Below are number of pages filtered by different reasons:
+    Number of traps: 5438
+    Number of similar file: 4937
+    Number of no permission crawled: 21
+    Number of empty/too large file: 1
+
+2. What is the longest page in terms of the number of words?
+longest_number: 111963
+longest_page: https://grape.ics.uci.edu/wiki/public/raw-attachment/wiki/cs122b-2018-spring-project5/TomcatTest.war
+
+3. What are the 50 most common words in the entire set of pages crawled under these domains
+uci ->29730
+ics ->27749
+s ->25537
+1 ->24955
+research ->21584
+2022 ->21268
+10 ->20387
+computer ->20226
+will ->20128
+2021 ->19657
+data ->19586
+2 ->18262
+n ->15743
+students ->15479
+information ->15196
+11 ->15190
+school ->14649
+3 ->14568
+edu ->14340
+bren ->14250
+5 ->14085
+4 ->13697
+software ->13492
+support ->13282
+can ->13098
+events ->13027
+media ->12983
+news ->12932
+project ->12798
+policies ->12713
+science ->12577
+wiki ->11902
+09 ->11871
+http ->11344
+t ->11293
+pdf ->11252
+d ->11102
+2020 ->11089
+markellekelly ->10894
+0 ->10787
+2018 ->10720
+12 ->10687
+search ->10535
+hans ->10290
+contact ->10134
+m ->9982
+projects ->9875
+university ->9841
+show ->9494
+computing ->9446
+page ->9354
+
+4. How many subdomains did you find in the ics.uci.edu domain? 
+Submit the list of subdomains ordered alphabetically and the number of unique pages detected in each subdomain. 
+acoi.ics.uci.edu 32
+aiclub.ics.uci.edu 2
+archive.ics.uci.edu 5
+asterix.ics.uci.edu 5
+cbcl.ics.uci.edu 286
+cert.ics.uci.edu 7
+checkin.ics.uci.edu 1
+chenli.ics.uci.edu 10
+cml.ics.uci.edu 120
+code.ics.uci.edu 15
+computableplant.ics.uci.edu 63
+cradl.ics.uci.edu 19
+create.ics.uci.edu 1
+cs.ics.uci.edu 22
+cwicsocal18.ics.uci.edu 11
+dgillen.ics.uci.edu 21
+ds4all.ics.uci.edu 2
+duttgroup.ics.uci.edu 115
+elms.ics.uci.edu 2
+emj.ics.uci.edu 32
+evoke.ics.uci.edu 4
+flamingo.ics.uci.edu 3
+fr.ics.uci.edu 3
+futurehealth.ics.uci.edu 102
+gitlab.ics.uci.edu 2
+grape.ics.uci.edu 1622
+graphics.ics.uci.edu 1
+graphmod.ics.uci.edu 1
+hack.ics.uci.edu 1
+hai.ics.uci.edu 5
+helpdesk.ics.uci.edu 2
+hpi.ics.uci.edu 4
+hub.ics.uci.edu 2
+iasl.ics.uci.edu 27
+icde2023.ics.uci.edu 46
+ieee.ics.uci.edu 13
+industryshowcase.ics.uci.edu 22
+ipf.ics.uci.edu 2
+isg.ics.uci.edu 235
+jgarcia.ics.uci.edu 22
+keys.ics.uci.edu 2
+mcs.ics.uci.edu 125
+mdogucu.ics.uci.edu 6
+mhcid.ics.uci.edu 17
+motifmap-rna.ics.uci.edu 2
+motifmap.ics.uci.edu 2
+mswe.ics.uci.edu 15
+nalini.ics.uci.edu 7
+ngs.ics.uci.edu 409
+oai.ics.uci.edu 6
+plrg.ics.uci.edu 85
+psearch.ics.uci.edu 1
+redmiles.ics.uci.edu 4
+sdcl.ics.uci.edu 175
+seal.ics.uci.edu 1
+sherlock.ics.uci.edu 7
+sli.ics.uci.edu 303
+stairs.ics.uci.edu 4
+statconsulting.ics.uci.edu 4
+student-council.ics.uci.edu 28
+summeracademy.ics.uci.edu 7
+support.ics.uci.edu 2
+swiki.ics.uci.edu 637
+tad.ics.uci.edu 1
+transformativeplay.ics.uci.edu 56
+tutors.ics.uci.edu 40
+ugradforms.ics.uci.edu 1
+unite.ics.uci.edu 10
+vision.ics.uci.edu 54
+wearablegames.ics.uci.edu 10
+wics.ics.uci.edu 560
+wiki.ics.uci.edu 1932
+www-db.ics.uci.edu 20
+www.cs.uci.edu 545
+www.graphics.ics.uci.edu 5
+www.ics.uci.edu 2417
+www.informatics.ics.uci.edu 1
+www.informatics.uci.edu 64
+www.stat.uci.edu 168
+xtune.ics.uci.edu 4
+

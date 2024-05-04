@@ -1,5 +1,8 @@
+from urllib.parse import urlparse, urljoin, unquote, urlencode, parse_qsl, urlunparse
+from bs4 import BeautifulSoup
+import urllib.robotparser
+import posixpath
 import re
-from urllib.parse import urlparse
 
 
 not_allowed = set()
@@ -43,7 +46,10 @@ stop_words = {
 }
 
 
-def printall():
+def printall()->None:
+    """
+    This function used for recordings, temps to print and write to different file at the end of crawling
+    """
     # print and write file
     print("Longest url: " + longest_url)
     print("longest_number: ", end = '')
@@ -71,7 +77,7 @@ def printall():
 
 
 
-def scraper(url, resp):
+def scraper(url, resp)->list:
     # this try exception block is used to detect some undefined cerficate error
     try:
         links = extract_next_links(url, resp)
@@ -81,7 +87,7 @@ def scraper(url, resp):
         return []
 
 
-def extract_next_links(url, resp):
+def extract_next_links(url, resp)->list:
     # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
@@ -97,12 +103,12 @@ def extract_next_links(url, resp):
         print("status is not 200")
         return []
 
-    # keep track of depth. if depth > 10, we will not visit it anymore. Here is how depth work
+    # keep track of depth. if depth > 15, we will not visit it anymore. Here is how depth work
     # if we have 5 websites: a b c and a have b link (a ->b), b have c link (b ->c), then depth of a =1 , depth of b =1, depth of c =1
     global depth
     if resp.url not in depth:
         depth[resp.url] = 1
-    elif depth[resp.url] > 20:
+    elif depth[resp.url] > 15:
         #temp
         with open('ING_trap.txt', 'a', encoding = "utf-8") as w:
             w.write(f"{url}\n")
@@ -114,7 +120,6 @@ def extract_next_links(url, resp):
     parsed = urlparse(resp.url)
 
     # Find all the url in the html file
-    from bs4 import BeautifulSoup
     # Decode: first find out the content type of the raw_response, which is charset='someencode'
     encode_information = resp.raw_response.headers.get("Content-Type")
     encode = "UTF-8"
@@ -156,12 +161,12 @@ def extract_next_links(url, resp):
         if single_hash % 4 == 0:
             single_fg.append(single_hash)
     # for every fingerprint we have, we compute the fingerprint using
-    # intersection / union. if similarity is bigger than 0.95, not access it.
+    # intersection / union. if similarity is bigger than 0.8, not access it.
     global finger_print
     for fg in finger_print:
         intersection = len(set(single_fg).intersection(set(fg)))
         union = len(set(single_fg).union(set(fg)))
-        if union != 0 and intersection * 1.0 / union > 0.95:
+        if union != 0 and intersection * 1.0 / union > 0.8:
             
             #temp
             with open('ING_similar.txt', 'a', encoding = "utf-8") as w:
@@ -206,7 +211,6 @@ def extract_next_links(url, resp):
         href = link.get('href')
 
         # combine the relative url and base url to absolute url
-        from urllib.parse import urljoin
         abs_url = urljoin(url, href) if href else url
         parsed = urlparse(abs_url)
 
@@ -220,12 +224,10 @@ def extract_next_links(url, resp):
             new_netloc = new_netloc.replace(":443", "")
 
         # normalize the path
-        import posixpath
         new_path = posixpath.normpath(parsed.path)
 
         # sort the query
         # use unquote to decode the query
-        from urllib.parse import unquote, urlencode, parse_qsl
         decoded_query = unquote(parsed.query)
         # make a list consisting of [key, value] pair
         key_value_querylist = parse_qsl(decoded_query, keep_blank_values = True)
@@ -235,7 +237,6 @@ def extract_next_links(url, resp):
         new_query = urlencode(sorted_query, doseq = True)
 
         # combine all the modified scheme, netloc, path, query with removing fragment to the new url
-        from urllib.parse import urlunparse
         new_url = urlunparse((new_scheme, new_netloc, new_path, parsed.params, new_query, ""))
 
         # check whether the new url is visited, if not add it to our return url_set and visited set. set the depth of new_url = depth of resp.url + 1
@@ -254,7 +255,7 @@ def extract_next_links(url, resp):
     return list(url_set)
 
 
-def is_valid(url):
+def is_valid(url:str)->bool:
     # Decide whether to crawl this url or not.
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
@@ -283,16 +284,15 @@ def is_valid(url):
             return False
 
         robot_url = parsed.scheme + "://" + parsed.netloc + "/robots.txt"
-        # import robotparser and build the robotfileparser
-        import urllib.robotparser
+        # build the robotfileparser
         robot_parser = urllib.robotparser.RobotFileParser()
         # set the url of robot parser to robots.txt
         robot_parser.set_url(robot_url)
         # read the allow
         robot_parser.read()
         # check whether we are able to get the content in robots.txt
-        if not robot_parser.can_fetch("IR US24 628479142， 33789241", url):
-            #US24 31754916,39263968,57585853改回去记得
+        if not robot_parser.can_fetch("IR US24 US24 31754916,39263968,57585853", url):
+
             print("robots.txt not allow" + url)
             #temp
             with open('ING_no_permission.txt', 'a', encoding = "utf-8") as w:
