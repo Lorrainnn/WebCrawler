@@ -1,3 +1,8 @@
+#This version of answer is based on setting max depth as 15/similarity check as 0.8. 
+If interested in difference of results between these features, we do provide another file as max depth as 20/similarity check as 0.9 for comparison.
+Since part of this assignment is highly based on our own interpretation and understanding, 
+we believe provides multi version for comparison could be helpful for further interview and grading.
+
 Question 1: How many unique pages did you find?
 To this question, we interpret "unique page" as the actual number of page crawled
 which is after passing all is_valid(), status/trap recognition/similarity test..
