@@ -1,10 +1,12 @@
-# CS121 - Project 2: Web Crawler
+# CS121 - Web Crawler
 
 **Date:** 05/03/2024  
 
 ## 🌐 Overview
 This project is a web crawler developed for CS121-Information Retrieval. It is capable of crawling allowed web pages under certain domains, collecting word frequencies, tracking visited URLs, and avoiding traps such as infinite crawling or duplicate pages.
 
+
+![alt text](architecture.png)
 ---
 
 ## 🔧 Global Variables
